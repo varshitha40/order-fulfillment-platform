@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory | OrderFlow</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: Arial, sans-serif; background: #f4f7fb; color: #243047; }
+        nav { background: #172554; color: white; padding: 20px 6%; }
+        nav a { color: white; text-decoration: none; margin-right: 18px; }
+        .container { max-width: 1050px; margin: 35px auto; padding: 0 18px; }
+        .grid { display: grid; grid-template-columns: 320px 1fr; gap: 22px; align-items: start; }
+        .card { background: white; padding: 24px; border-radius: 12px; box-shadow: 0 3px 12px #0000000a; }
+        label { display: block; margin: 16px 0 7px; font-weight: bold; }
+        input { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 7px; }
+        button { margin-top: 18px; padding: 12px; width: 100%; background: #2563eb; color: white; border: 0; border-radius: 7px; cursor: pointer; }
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 400px; }
+        th, td { padding: 13px 10px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+        th { background: #eff6ff; color: #1e40af; }
+        .message { padding: 12px; background: #dbeafe; border-radius: 7px; margin-bottom: 15px; }
+        .available { color: #15803d; font-weight: bold; }
+        @media(max-width: 750px) { .grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<nav>
+    <strong>📦 OrderFlow</strong>
+    <p>
+        <a href="/">Home</a>
+        <a href="/orders">Orders</a>
+        <a href="/shipping">Shipping</a>
+        <a href="/tracking">Track Order</a>
+    </p>
+</nav>
+
+<main class="container">
+    <h1>📦 Inventory Management</h1>
+    <p>Add products and monitor available stock.</p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <div class="message">{{ message }}</div>
+        {% endfor %}
+    {% endwith %}
+
+    <div class="grid">
+        <section class="card">
+            <h2>Add Stock</h2>
+            <form method="POST" action="/add-inventory">
+                <label for="product_name">Product Name</label>
+                <input id="product_name" name="product_name"
+                       type="text" required maxlength="100"
+                       placeholder="e.g. Laptop">
+
+                <label for="quantity">Quantity to Add</label>
+                <input id="quantity" name="quantity"
+                       type="number" min="0" required value="10">
+
+                <button type="submit">Add Inventory</button>
+            </form>
+        </section>
+
+        <section class="card">
+            <h2>Stock Overview</h2>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Total Stock</th>
+                            <th>Allocated</th>
+                            <th>Available</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for product in products %}
+                        <tr>
+                            <td>{{ product.product_name }}</td>
+                            <td>{{ product.quantity }}</td>
+                            <td>{{ product.allocated }}</td>
+                            <td class="available">
+                                {{ product.quantity - product.allocated }}
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="4">No inventory added yet.</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+</main>
+</body>
+</html>

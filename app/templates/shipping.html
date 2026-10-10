@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shipping | OrderFlow</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: Arial, sans-serif; background: #f4f7fb; color: #243047; }
+        nav { background: #172554; color: white; padding: 20px 6%; }
+        nav a { color: white; text-decoration: none; margin-right: 18px; }
+        .container { max-width: 1100px; margin: 35px auto; padding: 0 18px; }
+        .card { background: white; padding: 22px; border-radius: 12px; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 750px; }
+        th, td { padding: 14px 10px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+        th { background: #eff6ff; color: #1e40af; }
+        select, button { padding: 9px; border: 1px solid #cbd5e1; border-radius: 6px; }
+        button { background: #2563eb; color: white; border: 0; cursor: pointer; margin-top: 6px; }
+        .message { padding: 12px; background: #dbeafe; border-radius: 7px; margin-bottom: 15px; }
+        .empty { text-align: center; padding: 30px; color: #64748b; }
+    </style>
+</head>
+<body>
+<nav>
+    <strong>📦 OrderFlow</strong>
+    <p>
+        <a href="/">Home</a>
+        <a href="/orders">Orders</a>
+        <a href="/inventory">Inventory</a>
+        <a href="/tracking">Track Order</a>
+    </p>
+</nav>
+
+<main class="container">
+    <h1>🚚 Shipping Management</h1>
+    <p>View shipments and update delivery progress.</p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <div class="message">{{ message }}</div>
+        {% endfor %}
+    {% endwith %}
+
+    <section class="card">
+        {% if shipments %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Tracking Number</th>
+                    <th>Order ID</th>
+                    <th>Customer</th>
+                    <th>Courier</th>
+                    <th>Status</th>
+                    <th>Update Status</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for shipment in shipments %}
+                <tr>
+                    <td>{{ shipment.tracking_number }}</td>
+                    <td>#{{ shipment.order_id }}</td>
+                    <td>{{ shipment.order.customer_name }}</td>
+                    <td>{{ shipment.courier }}</td>
+                    <td>{{ shipment.status }}</td>
+                    <td>
+                        <form method="POST"
+                              action="{{ url_for('main.update_shipment', shipment_id=shipment.id) }}">
+                            <select name="status" required>
+                                {% for status in ["Preparing", "Shipped", "In Transit", "Out for Delivery", "Delivered"] %}
+                                <option value="{{ status }}"
+                                    {% if shipment.status == status %}selected{% endif %}>
+                                    {{ status }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <button type="submit">Update</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty">
+            <h3>No shipments yet</h3>
+            <p>Go to Orders and select Ship Order to create a shipment.</p>
+            <a href="/orders">View Orders →</a>
+        </div>
+        {% endif %}
+    </section>
+</main>
+</body>
+</html>

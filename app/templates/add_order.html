@@ -1,0 +1,48 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Order</title>
+</head>
+<body>
+    <h1>Create New Order</h1>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <p>{{ message }}</p>
+        {% endfor %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('main.add_order') }}">
+        <label>Customer Name:</label>
+        <input type="text" name="customer_name" required>
+        <br><br>
+
+        <label>Product:</label>
+        <select name="product_name" required>
+            <option value="">Select a product</option>
+            {% for product in products %}
+                <option value="{{ product.product_name }}">
+                    {{ product.product_name }} (Available: {{ product.quantity - product.allocated }})
+                </option>
+            {% endfor %}
+        </select>
+        <br><br>
+
+        <label>Quantity:</label>
+        <input type="number" name="quantity" min="1" required>
+        <br><br>
+
+        <label>Delivery Address:</label>
+        <textarea name="address" required></textarea>
+        <br><br>
+
+        <button type="submit">Create Order</button>
+    </form>
+
+    <p><a href="{{ url_for('main.orders') }}">View Orders</a></p>
+    <p><a href="{{ url_for('main.home') }}">Back to Dashboard</a></p>
+</body>
+</html>

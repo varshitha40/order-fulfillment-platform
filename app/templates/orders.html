@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orders | OrderFlow</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            color: #243047;
+        }
+        nav {
+            background: #172554;
+            color: white;
+            padding: 20px 6%;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin-right: 15px;
+        }
+        .container { max-width: 1150px; margin: 35px auto; padding: 0 18px; }
+        .heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 22px;
+        }
+        .btn {
+            background: #2563eb;
+            color: white;
+            padding: 11px 16px;
+            border-radius: 7px;
+            text-decoration: none;
+        }
+        .table-card {
+            background: white;
+            padding: 18px;
+            border-radius: 12px;
+            overflow-x: auto;
+        }
+        table { width: 100%; border-collapse: collapse; min-width: 850px; }
+        th, td {
+            padding: 13px 11px;
+            border-bottom: 1px solid #e2e8f0;
+            text-align: left;
+            font-size: 14px;
+        }
+        th { background: #eff6ff; color: #1e40af; }
+        .status {
+            display: inline-block;
+            background: #fef3c7;
+            color: #92400e;
+            border-radius: 20px;
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+        select, button {
+            padding: 8px;
+            border: 1px solid #cbd5e1;
+            border-radius: 5px;
+        }
+        button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+        .empty { padding: 35px; text-align: center; color: #64748b; }
+        .flash { padding: 12px; background: #dbeafe; border-radius: 7px; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+<nav>
+    <strong>📦 OrderFlow</strong>
+    <div>
+        <a href="/">Home</a>
+        <a href="/inventory">Inventory</a>
+        <a href="/shipping">Shipping</a>
+        <a href="/tracking">Track Order</a>
+    </div>
+</nav>
+
+<main class="container">
+    <div class="heading">
+        <div>
+            <h1>Customer Orders</h1>
+            <p>View orders and arrange shipments.</p>
+        </div>
+        <a class="btn" href="/add-order">＋ Create Order</a>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <div class="flash">{{ message }}</div>
+        {% endfor %}
+    {% endwith %}
+
+    <div class="table-card">
+        {% if orders %}
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Customer</th>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Address</th>
+                    <th>Status</th>
+                    <th>Shipment</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td>#{{ order.id }}</td>
+                    <td>{{ order.customer_name }}</td>
+                    <td>{{ order.product_name }}</td>
+                    <td>{{ order.quantity }}</td>
+                    <td>{{ order.address }}</td>
+                    <td><span class="status">{{ order.status }}</span></td>
+                    <td>
+                        {% if order.shipments %}
+                            Created
+                        {% else %}
+                            <form method="POST"
+                                  action="{{ url_for('main.create_shipment', order_id=order.id) }}">
+                                <input type="text" name="courier"
+                                       placeholder="Courier name" required>
+                                <button type="submit">Ship Order</button>
+                            </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty">
+            <h3>No orders yet</h3>
+            <p>Create your first order to see it here.</p>
+            <a href="/add-order">Create an Order</a>
+        </div>
+        {% endif %}
+    </div>
+</main>
+</body>
+</html>

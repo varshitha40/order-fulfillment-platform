@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track Order | OrderFlow</title>
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            color: #243047;
+        }
+
+        nav {
+            background: #172554;
+            color: white;
+            padding: 20px 6%;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin-right: 18px;
+        }
+
+        .container {
+            max-width: 750px;
+            margin: 45px auto;
+            padding: 0 18px;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 14px;
+            box-shadow: 0 4px 15px #0000000c;
+            margin-bottom: 22px;
+        }
+
+        input {
+            width: 100%;
+            padding: 13px;
+            margin: 12px 0;
+            border: 1px solid #cbd5e1;
+            border-radius: 7px;
+            font-size: 15px;
+        }
+
+        button {
+            background: #2563eb;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 7px;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        .message {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 12px;
+            border-radius: 7px;
+            margin-bottom: 15px;
+        }
+
+        .result {
+            border-left: 5px solid #2563eb;
+        }
+
+        .detail {
+            padding: 12px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .label {
+            color: #64748b;
+            display: block;
+            font-size: 13px;
+            margin-bottom: 5px;
+        }
+
+        .value {
+            font-weight: bold;
+            overflow-wrap: anywhere;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 7px 13px;
+            background: #dbeafe;
+            color: #1d4ed8;
+            border-radius: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <strong>📦 OrderFlow</strong>
+    <p>
+        <a href="/">Home</a>
+        <a href="/orders">Orders</a>
+        <a href="/inventory">Inventory</a>
+        <a href="/shipping">Shipping</a>
+    </p>
+</nav>
+
+<main class="container">
+    <section class="card">
+        <h1>📍 Track Your Delivery</h1>
+        <p>Enter your tracking number to check your shipment status.</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="message">{{ message }}</div>
+            {% endfor %}
+        {% endwith %}
+
+        <form method="POST" action="/tracking">
+            <label for="tracking_number">Tracking Number</label>
+            <input id="tracking_number"
+                   name="tracking_number"
+                   type="text"
+                   placeholder="Example: TRK00001"
+                   required>
+            <button type="submit">Track Order</button>
+        </form>
+    </section>
+
+    {% if shipment %}
+    <section class="card result">
+        <h2>Shipment Details</h2>
+
+        <div class="detail">
+            <span class="label">Tracking Number</span>
+            <span class="value">{{ shipment.tracking_number }}</span>
+        </div>
+
+        <div class="detail">
+            <span class="label">Customer Name</span>
+            <span class="value">{{ shipment.order.customer_name }}</span>
+        </div>
+
+        <div class="detail">
+            <span class="label">Product</span>
+            <span class="value">{{ shipment.order.product_name }}</span>
+        </div>
+
+        <div class="detail">
+            <span class="label">Quantity</span>
+            <span class="value">{{ shipment.order.quantity }}</span>
+        </div>
+
+        <div class="detail">
+            <span class="label">Courier</span>
+            <span class="value">{{ shipment.courier }}</span>
+        </div>
+
+        <div class="detail">
+            <span class="label">Delivery Address</span>
+            <span class="value">{{ shipment.order.address }}</span>
+        </div>
+
+        <div class="detail">
+            <span class="label">Current Shipment Status</span>
+            <span class="status">{{ shipment.status }}</span>
+        </div>
+    </section>
+    {% endif %}
+</main>
+
+</body>
+</html>
